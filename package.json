@@ -1,0 +1,21 @@
+{
+  "name": "read-closer",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "pako": "^2.1.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "jsdom": "^29.0.1",
+    "vite": "^8.0.1",
+    "vitest": "^4.1.0"
+  }
+}

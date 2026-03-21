@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annotate — Close Reading Tool</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <!-- CREATE SCREEN -->
+  <main id="create-screen" class="screen">
+    <header class="create-header">
+      <h1>Annotate</h1>
+      <p class="subtitle">Share passages for close reading. No accounts, no servers — everything lives in the link.</p>
+    </header>
+
+    <div class="create-form">
+      <button id="toggle-options" class="toggle-options" type="button">+ Title &amp; Prompt</button>
+      <div id="optional-fields" class="optional-fields hidden">
+        <input type="text" id="title-input" placeholder="Passage title (optional)" maxlength="200">
+        <input type="text" id="prompt-input" placeholder="Instruction or prompt (optional)" maxlength="500">
+      </div>
+
+      <textarea id="text-input" placeholder="Paste or type your passage here…" rows="12"></textarea>
+
+      <div class="budget-bar">
+        <span id="budget-text">0 words · ~0 chars in link</span>
+      </div>
+
+      <button id="create-btn" class="btn-primary" type="button" disabled>Create Link</button>
+    </div>
+
+    <div id="output-area" class="output-area hidden">
+      <div class="url-row">
+        <input type="text" id="url-output" readonly>
+        <button id="copy-btn" class="btn-secondary" type="button">Copy</button>
+      </div>
+
+      <div id="qr-container" class="qr-container">
+        <canvas id="qr-canvas"></canvas>
+        <button id="download-qr-btn" class="btn-secondary" type="button">Download QR</button>
+      </div>
+      <p id="qr-warning" class="qr-warning hidden">This passage is too long for a QR code. Use the link instead.</p>
+
+      <div id="compression-meter" class="compression-meter">
+        <div id="meter-fill" class="meter-fill"></div>
+        <span id="meter-label"></span>
+      </div>
+    </div>
+  </main>
+
+  <!-- ANNOTATE / READ SCREEN -->
+  <main id="read-screen" class="screen hidden">
+    <header class="read-header">
+      <h2 id="passage-title"></h2>
+      <p id="passage-prompt" class="prompt-text"></p>
+      <div class="name-row">
+        <label for="name-input">Your name:</label>
+        <input type="text" id="name-input" placeholder="Anonymous" maxlength="40">
+      </div>
+      <div id="author-filters" class="author-filters"></div>
+    </header>
+
+    <div class="passage-container">
+      <div id="passage-text" class="passage-text"></div>
+      <aside id="margin-notes" class="margin-notes"></aside>
+    </div>
+
+    <!-- Floating annotation toolbar (hidden until text selected) -->
+    <div id="annotation-toolbar" class="annotation-toolbar hidden">
+      <div class="colour-swatches">
+        <button class="swatch" data-colour="0" style="background:#FFF3B0" title="Yellow"></button>
+        <button class="swatch" data-colour="1" style="background:#B8D4E3" title="Blue"></button>
+        <button class="swatch" data-colour="2" style="background:#C2E0C6" title="Green"></button>
+        <button class="swatch" data-colour="3" style="background:#F5C6CB" title="Pink"></button>
+      </div>
+      <input type="text" id="note-input" placeholder="Add a note…" maxlength="500">
+      <div class="toolbar-actions">
+        <button id="save-annotation-btn" class="btn-primary btn-small" type="button">Save</button>
+        <button id="cancel-annotation-btn" class="btn-secondary btn-small" type="button">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Share bar -->
+    <div class="share-bar">
+      <button id="share-copy-btn" class="btn-secondary" type="button">Copy Link</button>
+      <button id="share-qr-btn" class="btn-secondary" type="button">Download QR</button>
+      <button id="share-email-btn" class="btn-secondary" type="button">Email Link</button>
+      <button id="share-export-btn" class="btn-secondary" type="button">Export Notes</button>
+    </div>
+  </main>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
