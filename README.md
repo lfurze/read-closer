@@ -34,17 +34,16 @@ npm run build     # Production build to dist/
 - [Vite](https://vite.dev) — dev server and build
 - [Vitest](https://vitest.dev) — testing (jsdom)
 - [pako](https://github.com/nicholasgee/pako) — compression
-- [qrcode](https://github.com/soldair/node-qrcode) — QR generation
 - [jsPDF](https://github.com/parallax/jsPDF) — PDF export
 
 ## Features
 
-- Paste text, generate shareable link + QR code
+- Paste text, generate a shareable link
 - Highlight text with 4 colours, add margin notes
 - Reply to annotations in threaded conversations
 - Multiple annotation layers with per-author toggle
 - Margin notes anchored alongside their highlights
-- Compression meter showing QR/link capacity
+- Compression meter showing link capacity
 - PDF export with full annotation details
 - Mobile-first responsive design
 - Keyboard shortcut: Cmd/Ctrl+Enter to submit

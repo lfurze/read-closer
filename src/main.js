@@ -1,7 +1,6 @@
 import { encode, decode } from './codec.js';
 import { createState, addAnnotation, removeAnnotation, addReply, getAuthors } from './state.js';
 import { renderPassage } from './renderer.js';
-import QRCode from 'qrcode';
 import { jsPDF } from 'jspdf';
 
 // ===== DOM refs =====
@@ -17,10 +16,6 @@ const createBtn = document.getElementById('create-btn');
 const outputArea = document.getElementById('output-area');
 const urlOutput = document.getElementById('url-output');
 const copyBtn = document.getElementById('copy-btn');
-const qrCanvas = document.getElementById('qr-canvas');
-const qrContainer = document.getElementById('qr-container');
-const qrWarning = document.getElementById('qr-warning');
-const downloadQrBtn = document.getElementById('download-qr-btn');
 const meterFill = document.getElementById('meter-fill');
 const meterLabel = document.getElementById('meter-label');
 
@@ -35,7 +30,6 @@ const noteInput = document.getElementById('note-input');
 const saveAnnotationBtn = document.getElementById('save-annotation-btn');
 const cancelAnnotationBtn = document.getElementById('cancel-annotation-btn');
 const shareCopyBtn = document.getElementById('share-copy-btn');
-const shareQrBtn = document.getElementById('share-qr-btn');
 const shareEmailBtn = document.getElementById('share-email-btn');
 const shareExportBtn = document.getElementById('share-export-btn');
 
@@ -46,7 +40,6 @@ let selectionRange = null; // { start, end }
 let visibleAuthors = null; // null = show all
 
 const COLOURS = ['#FFF3B0', '#B8D4E3', '#C2E0C6', '#F5C6CB'];
-const QR_LIMIT = 4000;
 
 // ===== Init =====
 function init() {
@@ -118,7 +111,6 @@ createBtn.addEventListener('click', () => {
   outputArea.classList.remove('hidden');
 
   updateMeter(url.length);
-  renderQr(url);
 });
 
 copyBtn.addEventListener('click', () => {
@@ -133,33 +125,15 @@ function updateMeter(len) {
   meterFill.classList.remove('green', 'amber', 'red');
   if (len < 3000) {
     meterFill.classList.add('green');
-    meterLabel.textContent = 'QR-friendly';
+    meterLabel.textContent = 'Short link — easy to share';
   } else if (len < 5000) {
     meterFill.classList.add('amber');
-    meterLabel.textContent = 'QR may not scan on all devices';
+    meterLabel.textContent = 'Medium link — works in most places';
   } else {
     meterFill.classList.add('red');
-    meterLabel.textContent = 'Link only — too long for QR';
+    meterLabel.textContent = 'Long link — may be truncated by some apps';
   }
 }
-
-async function renderQr(url) {
-  if (url.length > QR_LIMIT) {
-    qrContainer.classList.add('hidden');
-    qrWarning.classList.remove('hidden');
-    return;
-  }
-  qrWarning.classList.add('hidden');
-  qrContainer.classList.remove('hidden');
-  await QRCode.toCanvas(qrCanvas, url, { width: 200, margin: 2 });
-}
-
-downloadQrBtn.addEventListener('click', () => {
-  const link = document.createElement('a');
-  link.download = 'annotate-qr.png';
-  link.href = qrCanvas.toDataURL('image/png');
-  link.click();
-});
 
 // ===== READ SCREEN =====
 function showReadScreen() {
@@ -207,11 +181,10 @@ function renderAuthorFilters(authors) {
     btn.addEventListener('click', () => {
       const author = btn.dataset.author;
       if (!visibleAuthors) {
-        // First click: show only this author
         visibleAuthors = [author];
       } else if (visibleAuthors.includes(author)) {
         visibleAuthors = visibleAuthors.filter(a => a !== author);
-        if (visibleAuthors.length === 0) visibleAuthors = null; // show all
+        if (visibleAuthors.length === 0) visibleAuthors = null;
       } else {
         visibleAuthors = [...visibleAuthors, author];
       }
@@ -249,7 +222,6 @@ function renderMarginNotes(annotations) {
       </div>`;
   }).join('');
 
-  // Position each note card alongside its highlight span
   positionMarginNotes(notesWithNotes);
 
   marginNotes.querySelectorAll('.delete-note').forEach(btn => {
@@ -298,9 +270,7 @@ function positionMarginNotes(annotations) {
     const cardEl = marginNotes.querySelector(`.note-card[data-id="${ann.id}"]`);
     if (!highlightEl || !cardEl) continue;
 
-    // Target: align note with its highlight
     const highlightTop = highlightEl.getBoundingClientRect().top - containerTop;
-    // Prevent overlap with previous note
     const top = Math.max(highlightTop, lastBottom);
     cardEl.style.top = `${top}px`;
 
@@ -318,13 +288,10 @@ function updateUrl() {
 }
 
 // ===== ANNOTATION INTERACTION =====
-let toolbarSelection = null;
-
 document.addEventListener('mouseup', handleSelectionEnd);
 document.addEventListener('touchend', handleSelectionEnd);
 
 function handleSelectionEnd() {
-  // Delay to let selection finalise
   setTimeout(() => {
     const sel = window.getSelection();
     if (!sel || sel.isCollapsed || !passageText.contains(sel.anchorNode)) {
@@ -339,7 +306,6 @@ function handleSelectionEnd() {
 }
 
 function getCharacterOffsets(sel) {
-  // Walk the passage text node to find character offsets
   const range = sel.getRangeAt(0);
   const preRange = document.createRange();
   preRange.selectNodeContents(passageText);
@@ -357,12 +323,10 @@ function positionToolbar(sel) {
   const rect = range.getBoundingClientRect();
   toolbar.classList.remove('hidden');
 
-  // Measure toolbar height so we can flip above if needed
   const toolbarHeight = toolbar.offsetHeight;
   const spaceBelow = window.innerHeight - rect.bottom;
 
   if (spaceBelow < toolbarHeight + 16) {
-    // Not enough room below — position above the selection
     toolbar.style.top = `${rect.top - toolbarHeight - 8}px`;
   } else {
     toolbar.style.top = `${rect.bottom + 8}px`;
@@ -386,7 +350,6 @@ toolbar.querySelectorAll('.swatch').forEach(btn => {
     btn.classList.add('selected');
   });
 });
-// Default selection
 toolbar.querySelector('.swatch')?.classList.add('selected');
 
 function submitAnnotation() {
@@ -419,20 +382,6 @@ shareCopyBtn.addEventListener('click', () => {
   navigator.clipboard.writeText(window.location.href);
   shareCopyBtn.textContent = 'Copied!';
   setTimeout(() => { shareCopyBtn.textContent = 'Copy Link'; }, 1500);
-});
-
-shareQrBtn.addEventListener('click', async () => {
-  const url = window.location.href;
-  if (url.length > QR_LIMIT) {
-    alert('URL is too long for a QR code. Use the link instead.');
-    return;
-  }
-  const canvas = document.createElement('canvas');
-  await QRCode.toCanvas(canvas, url, { width: 300, margin: 2 });
-  const link = document.createElement('a');
-  link.download = 'annotate-qr.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
 });
 
 shareEmailBtn.addEventListener('click', () => {
@@ -509,28 +458,23 @@ function exportPdf(state) {
     return lines.length;
   }
 
-  // Title
   if (state.title) {
     writeText(state.title, margin, contentW, { fontSize: 18, style: 'bold' });
     y += 3;
   }
 
-  // Prompt
   if (state.prompt) {
     writeText(state.prompt, margin, contentW, { fontSize: 11, style: 'italic', color: '#666666' });
     y += 3;
   }
 
-  // Subtitle
   writeText('Annotations', margin, contentW, { fontSize: 13, style: 'bold' });
   y += 2;
 
-  // Divider
   doc.setDrawColor('#e0ddd8');
   doc.line(margin, y, pageW - margin, y);
   y += 6;
 
-  // Annotations sorted by position
   const sorted = [...state.annotations].filter(a => a.note).sort((a, b) => a.start - b.start);
 
   for (const ann of sorted) {
@@ -539,7 +483,6 @@ function exportPdf(state) {
 
     checkPage(25);
 
-    // Highlight colour bar
     const rgb = COLOUR_RGB[colourIdx] || COLOUR_RGB[0];
     doc.setFillColor(rgb[0], rgb[1], rgb[2]);
     doc.rect(margin, y - 3, 3, 14, 'F');
@@ -547,19 +490,15 @@ function exportPdf(state) {
     const indentX = margin + 6;
     const indentW = contentW - 6;
 
-    // Author
     writeText(ann.author, indentX, indentW, { fontSize: 8, style: 'bold', color: '#666666' });
     y += 0.5;
 
-    // Quoted snippet
     const truncated = snippet.length > 200 ? snippet.slice(0, 200) + '…' : snippet;
     writeText(`"${truncated}"`, indentX, indentW, { fontSize: 9, style: 'italic', color: '#555555' });
     y += 1;
 
-    // Note
     writeText(ann.note, indentX, indentW, { fontSize: 10 });
 
-    // Replies
     if (ann.replies && ann.replies.length > 0) {
       y += 1.5;
       for (const reply of ann.replies) {
@@ -567,7 +506,6 @@ function exportPdf(state) {
         const replyX = indentX + 4;
         const replyW = indentW - 4;
 
-        // Reply indicator
         doc.setDrawColor('#cccccc');
         doc.line(indentX + 1, y - 2.5, indentX + 1, y + 2);
 
