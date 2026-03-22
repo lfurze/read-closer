@@ -222,4 +222,48 @@ textarea {
   .note-card { position: static !important; margin-bottom: 0.75rem; }
   .screen { padding: 1rem; }
   .logo { font-size: 1.4rem; }
+
+  /* Larger touch targets */
+  .btn-primary { padding: 0.85rem 1.5rem; font-size: 1rem; width: 100%; }
+  .btn-secondary { padding: 0.6rem 1rem; }
+  .swatch { width: 36px; height: 36px; }
+
+  /* Textarea fills screen better */
+  textarea { font-size: 16px; /* prevents iOS zoom on focus */ }
+  .optional-fields input { font-size: 16px; }
+  .name-row input { font-size: 16px; width: 100%; }
+  .name-row { flex-direction: column; align-items: flex-start; }
+
+  /* Annotation toolbar takes full width on mobile */
+  .annotation-toolbar {
+    position: fixed; bottom: 0; left: 0; right: 0; top: auto !important;
+    border-radius: var(--radius) var(--radius) 0 0;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.15);
+    min-width: unset; padding: 1rem;
+  }
+  .annotation-toolbar input { font-size: 16px; padding: 0.6rem; }
+  .toolbar-actions { gap: 0.75rem; }
+  .toolbar-actions .btn-primary,
+  .toolbar-actions .btn-secondary { flex: 1; text-align: center; padding: 0.6rem; }
+
+  /* Share bar full width pills */
+  .share-bar { justify-content: center; padding: 0.75rem 0; gap: 0.4rem; }
+  .share-bar .btn-secondary { flex: 1; text-align: center; padding: 0.6rem 0.5rem; font-size: 0.75rem; }
+
+  /* URL output easier to tap */
+  .url-row { flex-direction: column; }
+  .url-row input { font-size: 14px; }
+
+  /* Instructions slightly smaller on mobile */
+  .instructions { font-size: 0.9rem; padding: 0.75rem 1rem; }
+
+  /* Passage text readable but not too large */
+  .passage-text { font-size: 1rem; line-height: 1.8; }
+
+  /* Reply form stacks better */
+  .reply-form { flex-direction: column; }
+  .reply-form input { font-size: 16px; }
+
+  /* Footer breathing room above sticky share bar */
+  .site-footer { padding-bottom: 2rem; }
 }

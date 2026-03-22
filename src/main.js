@@ -319,19 +319,26 @@ function getCharacterOffsets(sel) {
 }
 
 function positionToolbar(sel) {
-  const range = sel.getRangeAt(0);
-  const rect = range.getBoundingClientRect();
   toolbar.classList.remove('hidden');
 
-  const toolbarHeight = toolbar.offsetHeight;
-  const spaceBelow = window.innerHeight - rect.bottom;
-
-  if (spaceBelow < toolbarHeight + 16) {
-    toolbar.style.top = `${rect.top - toolbarHeight - 8}px`;
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    // CSS handles bottom-docked positioning on mobile
+    toolbar.style.top = '';
+    toolbar.style.left = '';
   } else {
-    toolbar.style.top = `${rect.bottom + 8}px`;
+    const range = sel.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    const toolbarHeight = toolbar.offsetHeight;
+    const spaceBelow = window.innerHeight - rect.bottom;
+
+    if (spaceBelow < toolbarHeight + 16) {
+      toolbar.style.top = `${rect.top - toolbarHeight - 8}px`;
+    } else {
+      toolbar.style.top = `${rect.bottom + 8}px`;
+    }
+    toolbar.style.left = `${Math.max(8, rect.left)}px`;
   }
-  toolbar.style.left = `${Math.max(8, rect.left)}px`;
   noteInput.value = '';
   noteInput.focus();
 }
