@@ -46,6 +46,15 @@ body {
 }
 .logo:hover { opacity: 0.8; }
 
+.header-row {
+  display: flex; align-items: center; justify-content: center; gap: 1.25rem;
+}
+.nav-link {
+  font-size: 0.85rem; color: var(--text-muted); text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.nav-link:hover { color: var(--text); border-bottom-color: var(--text); }
+
 /* How it works dropdown */
 .how-it-works {
   max-width: 540px; margin: 0.75rem auto 0; text-align: left;
