@@ -2,7 +2,7 @@
 
 ## Project Summary
 
-A zero-infrastructure, client-side web application that lets educators share passages of text for close reading via a link or QR code. Students scan the code, annotate the text (highlight + marginalia notes), and share their annotated version back as a new link. Annotations can chain: a teacher or peer can open an annotated link, add their own layer, and pass it on.
+A zero-infrastructure, client-side web application that lets educators share passages of text for close reading via a link. Students open the link, annotate the text (highlight + marginalia notes), and share their annotated version back as a new link. Annotations can chain: a teacher or peer can open an annotated link, add their own layer, and pass it on.
 
 All data lives in the URL fragment. No server, no accounts, no storage, no sign-up.
 
@@ -24,13 +24,12 @@ Follows the same architectural pattern as [Ziptable](https://ziptbl.com/): compr
 6. App displays:
    - The full shareable URL.
    - A "Copy Link" button.
-   - A QR code (downloadable as PNG).
    - A compression/capacity meter showing how much URL budget is used (see Constraints section).
-7. Teacher shares the link or QR code with students via any channel (projected on screen, printed on handout, dropped in LMS, emailed, etc.).
+7. Teacher shares the link with students via any channel (projected on screen, dropped in LMS, emailed, etc.).
 
 ### Flow 2: Student Annotates
 
-1. Student opens the link (scanned QR, clicked link, etc.).
+1. Student opens the link.
 2. App decompresses the URL fragment and renders:
    - The passage title and prompt (if provided) at the top.
    - The full passage text in a clean, readable layout.
@@ -44,7 +43,6 @@ Follows the same architectural pattern as [Ziptable](https://ziptbl.com/): compr
 6. Student can delete or edit their own annotations.
 7. At any point, the URL fragment updates live to include annotations. The student can:
    - Click "Share" to copy the updated link.
-   - Click "Download QR" to get a QR code of the annotated version.
    - Click "Email Link" to open a `mailto:` link with the URL pre-filled in the body.
 
 ### Flow 3: Chained / Layered Annotations
@@ -112,23 +110,17 @@ On load, reverse the process: read fragment, base64url-decode, pako `inflate`, J
 
 ## Constraints and Mitigations
 
-### QR Code Capacity
+### URL Length and Compression
 
-QR Version 40 (largest standard) holds approximately:
-- 4,296 alphanumeric characters
-- 2,953 bytes (binary mode)
-
-A 500-word passage (~3,000 raw characters) compresses to roughly 1,500-2,000 base64url characters. Adding the domain, path, and `#` uses ~30 characters. That leaves room for annotations, but it's tight.
+A 500-word passage (~3,000 raw characters) compresses to roughly 1,500-2,000 base64url characters. Adding the domain, path, and `#` uses ~30 characters. That leaves room for annotations, but long passages with many annotations can produce very long URLs.
 
 **Mitigations (implement all):**
 
 1. **Compression meter**: Show a visual gauge on both the create and annotate screens. Use three zones:
-   - Green (0-3,000 chars): Comfortable for QR and all sharing methods.
-   - Amber (3,000-5,000 chars): QR may not scan reliably on all devices. Link sharing still works perfectly.
-   - Red (5,000+ chars): QR not recommended. Link still works in browsers (most support fragments up to ~64KB).
-2. **QR code auto-hide**: If the URL exceeds 4,000 characters, hide the QR option and show a message: "This passage is too long for a QR code. Use the link instead."
-3. **URL shortener option**: Offer a "Shorten URL" button (using TinyURL or similar public API) with a clear privacy warning, exactly as Ziptable does. Short URLs are QR-friendly but introduce a third-party dependency.
-4. **Character budget guidance**: On the create screen, show a live count: "~X words / approximately Y characters in link / QR: OK/Too long".
+   - Green (0-3,000 chars): Comfortable for all sharing methods.
+   - Amber (3,000-5,000 chars): Link sharing still works perfectly, but some platforms may truncate.
+   - Red (5,000+ chars): Link still works in browsers (most support fragments up to ~64KB), but may be truncated by some sharing platforms.
+2. **Character budget guidance**: On the create screen, show a live count: "~X words / approximately Y characters in link".
 
 ### URL Length Limits
 
@@ -146,7 +138,7 @@ Character offsets are fragile if the underlying text changes. Since the text is 
 
 ### General Principles
 
-- Mobile-first. Most students will scan a QR code on a phone.
+- Mobile-first. Many students will open links on a phone.
 - Minimal chrome. The passage text should dominate the screen.
 - Accessible. Sufficient colour contrast on highlights. Notes accessible via tap/click, not hover-only.
 - Fast. No framework overhead. Vanilla JS or a lightweight framework (Preact, if needed). The entire app should be a single HTML file or a tiny static bundle.
@@ -160,8 +152,6 @@ Character offsets are fragile if the underlying text changes. Since the text is 
 - "Create Link" button (primary action).
 - Below the button, the output area appears after creation:
   - Full URL in a read-only input with "Copy" button.
-  - QR code (rendered via a client-side library, e.g., `qrcode.js` or `qr-creator`).
-  - "Download QR as PNG" button.
   - Compression meter.
 
 #### 2. Annotate / Read Screen
@@ -181,7 +171,6 @@ Activates when the URL contains a fragment.
 - **Author filter**: If multiple authors have annotations, show toggles (pill buttons) at the top to show/hide each author's layer.
 - **Share bar** (sticky bottom on mobile, fixed sidebar section on desktop):
   - "Copy Link" button (always available, copies current URL with all annotations).
-  - "Download QR" button (hidden if URL too long).
   - "Email Link" button (opens `mailto:?subject=Annotated: {title}&body={url}`).
   - "Export Notes" button: Downloads a simple text file or CSV with columns: Highlighted Text | Note | Author | Position.
 
@@ -205,7 +194,6 @@ Activates when the URL contains a fragment.
 - **Static site**: Single page application. Deployable on Cloudflare Pages (Leon already uses this for client work).
 - **No framework required**: Vanilla JS is fine. If a framework helps with reactivity (annotation state management), Preact or Alpine.js are acceptable. Keep the bundle tiny.
 - **Compression**: [pako](https://github.com/nicholasgee/pako) (widely used, small, reliable deflate implementation).
-- **QR generation**: [qr-creator](https://github.com/nicholasgee/QR-Code-generator) or [qrcode.js](https://github.com/nicholasgee/qrcodejs). Must support PNG export/download.
 - **No build step required**: If using vanilla JS, the app can be a single `index.html` with inline or adjacent JS/CSS. If using a build step, keep it simple (Vite).
 - **Deployment**: Cloudflare Pages via Git push. Custom domain optional.
 
@@ -216,10 +204,10 @@ Activates when the URL contains a fragment.
 ### Priority Order
 
 1. **Core encode/decode loop**: Get the compress-to-fragment and decompress-from-fragment cycle working first. This is the foundation. Test with a 500-word passage.
-2. **Create screen**: Paste text, generate URL, display QR.
+2. **Create screen**: Paste text, generate URL.
 3. **Read screen**: Detect fragment, decompress, render passage.
 4. **Annotation**: Text selection, highlight creation, note input, state management, URL update.
-5. **Sharing**: Copy link, QR download, mailto, export.
+5. **Sharing**: Copy link, mailto, export.
 6. **Chaining**: Multiple author support, author filters, layered display.
 7. **Polish**: Compression meter, mobile responsiveness, visual design, edge cases.
 
@@ -227,19 +215,17 @@ Activates when the URL contains a fragment.
 
 ```bash
 npm install pako        # compression
-npm install qrcode      # QR code generation (or use a CDN)
 ```
 
 Or use CDN links if building as a single HTML file:
 ```
 https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js
-https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js
 ```
 
 ### Edge Cases to Handle
 
 - Empty text submission: Prevent with validation.
-- Very long passages: Show compression meter warning, hide QR if over limit.
+- Very long passages: Show compression meter warning.
 - Overlapping highlights: Allow them. Render with nested spans or use a more sophisticated approach (e.g., mark.js-style painting). Overlapping highlights from different authors should blend colours (CSS `mix-blend-mode: multiply` on highlight spans can achieve this).
 - Special characters in text: JSON handles Unicode. Ensure the base64url encoding is clean.
 - Fragment not present on load: Show the create screen.
@@ -249,11 +235,9 @@ https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js
 ### Testing Checklist
 
 - [ ] Paste 100-word passage, generate link, open in new tab: text renders correctly.
-- [ ] Paste 500-word passage, check QR scans on iPhone and Android.
 - [ ] Add 5 annotations, share link, open: all annotations visible and correctly positioned.
 - [ ] Chain: Person A annotates, shares. Person B opens, adds annotations, shares. Person A opens: both layers visible.
 - [ ] Compression meter accurately reflects URL length.
-- [ ] QR hidden when URL exceeds 4,000 chars.
 - [ ] Mobile: annotation workflow works on iOS Safari and Android Chrome.
 - [ ] Export: CSV/text download contains all annotations with correct text snippets.
 - [ ] Mailto: link opens email client with correct subject and body.
