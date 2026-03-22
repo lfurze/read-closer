@@ -1,6 +1,6 @@
 # read/closer
 
-A zero-infrastructure, client-side close reading and annotation tool. Teachers share passages via a link or QR code, students annotate them, and share their annotated version back — all without accounts, servers, or sign-ups.
+A zero-infrastructure, client-side close reading and annotation tool. Teachers share passages via a link, students annotate them, and share their annotated version back — all without accounts, servers, or sign-ups.
 
 **All data lives in the URL fragment.** Nothing is ever sent to a server.
 
@@ -8,7 +8,7 @@ Live at [readcloser.com](https://readcloser.com)
 
 ## How it works
 
-1. **Teacher** pastes a passage, clicks "Create Link", and shares the URL or QR code
+1. **Teacher** pastes a passage, clicks "Create Link", and shares the URL
 2. **Student** opens the link, highlights text, adds notes, and shares their annotated version
 3. **Chaining** — anyone can open an annotated link, add their own layer, and pass it on
 4. **Review** — toggle annotation layers by author, reply to annotations, export to PDF
@@ -17,7 +17,7 @@ Live at [readcloser.com](https://readcloser.com)
 
 Structured data (passage text + annotations) is compressed with [pako](https://github.com/nicholasgee/pako) (raw deflate), base64url-encoded, and placed after the `#` in the URL. The browser never sends the fragment to the server, so everything stays client-side.
 
-A 500-word passage compresses to roughly 1,500–2,000 characters in the URL — well within QR code and browser limits.
+A 500-word passage compresses to roughly 1,500–2,000 characters in the URL — well within browser limits.
 
 ## Development
 
@@ -47,6 +47,10 @@ npm run build     # Production build to dist/
 - PDF export with full annotation details
 - Mobile-first responsive design
 - Keyboard shortcut: Cmd/Ctrl+Enter to submit
+
+## Known issues
+
+- **Long URLs may trigger browser warnings.** Because all data is stored in the URL fragment, very long passages or heavily annotated texts can produce URLs that trigger Chrome's "suspicious URL" warning screen. This is a heuristic in Chrome's Safe Browsing and cannot be controlled from the site. Keep passages under ~500 words for the best experience, and use the compression meter as a guide.
 
 ## License
 
