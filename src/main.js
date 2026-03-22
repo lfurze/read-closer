@@ -6,6 +6,8 @@ import { jsPDF } from 'jspdf';
 // ===== DOM refs =====
 const createScreen = document.getElementById('create-screen');
 const readScreen = document.getElementById('read-screen');
+const howCreate = document.getElementById('how-create');
+const howRead = document.getElementById('how-read');
 const toggleOptions = document.getElementById('toggle-options');
 const optionalFields = document.getElementById('optional-fields');
 const titleInput = document.getElementById('title-input');
@@ -69,6 +71,8 @@ function init() {
 function showCreateScreen() {
   createScreen.classList.remove('hidden');
   readScreen.classList.add('hidden');
+  howCreate.style.display = '';
+  howRead.style.display = 'none';
 }
 
 toggleOptions.addEventListener('click', () => {
@@ -139,6 +143,8 @@ function updateMeter(len) {
 function showReadScreen() {
   createScreen.classList.add('hidden');
   readScreen.classList.remove('hidden');
+  howCreate.style.display = 'none';
+  howRead.style.display = '';
   renderRead();
 }
 
