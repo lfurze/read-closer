@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reading Methods — read/closer</title>
+  <meta name="description" content="Close reading methods and example activities for use with read/closer.">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .examples-page { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .examples-intro { margin-bottom: 2rem; }
+    .examples-intro h2 { font-family: var(--serif); font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .examples-intro p { color: var(--text-muted); line-height: 1.6; }
+
+    .method-list { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .method-card {
+      background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 1.25rem 1.5rem; box-shadow: var(--shadow);
+    }
+    .method-card h3 {
+      font-family: var(--serif); font-size: 1.15rem; margin-bottom: 0.35rem;
+    }
+    .method-strategy {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--text-muted); margin-bottom: 0.5rem;
+    }
+    .method-desc {
+      font-size: 0.9rem; color: var(--text); line-height: 1.6; margin-bottom: 0.75rem;
+    }
+
+    .colour-key {
+      display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.75rem;
+    }
+    .colour-key-item {
+      display: flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; color: var(--text-muted);
+    }
+    .colour-dot {
+      width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+    }
+
+    .method-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .method-actions a {
+      display: inline-block; padding: 0.45rem 1rem; background: var(--text); color: var(--bg);
+      border-radius: var(--radius); font-size: 0.85rem; text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .method-actions a:hover { opacity: 0.85; }
+
+    .book-link {
+      margin-top: 2rem; padding: 1rem 1.25rem; background: #f0efe9;
+      border-radius: var(--radius); font-size: 0.875rem; color: var(--text-muted);
+      text-align: center; line-height: 1.5;
+    }
+    .book-link a { color: var(--text); font-weight: 600; }
+
+    @media (max-width: 768px) {
+      .examples-page { padding: 1rem; }
+      .method-card { padding: 1rem; }
+      .colour-key { gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="site-header">
+    <a href="/" class="logo">read<span class="logo-slash">/</span>closer</a>
+  </nav>
+
+  <main class="examples-page">
+    <div class="examples-intro">
+      <h2>Reading Methods</h2>
+      <p>Each method below is a structured close reading activity. The colour key shows what each highlight colour means for that method. Click <strong>Try it</strong> to open an example passage with the method pre-loaded.</p>
+    </div>
+
+    <div class="method-list">
+
+      <div class="method-card">
+        <div class="method-strategy">Making Connections</div>
+        <h3>Connections Coding</h3>
+        <p class="method-desc">Students read a passage and highlight connections using three colours — one for personal experience, one for other texts, and one for the wider world. Margin notes explain each connection.</p>
+        <div class="colour-key">
+          <span class="colour-key-item"><span class="colour-dot" style="background:var(--highlight-0)"></span> Text-to-self</span>
+          <span class="colour-key-item"><span class="colour-dot" style="background:var(--highlight-1)"></span> Text-to-text</span>
+          <span class="colour-key-item"><span class="colour-dot" style="background:var(--highlight-2)"></span> Text-to-world</span>
+        </div>
+        <div class="method-actions">
+          <a href="/#TVTLjuQ2DPwVok-zgKeBXAfIYbMIkhxyymMRYC-0RdtCy6IjyvZ6g_x7inJmMIfudlssklVF6p_bfnv5rrvVWJPcXm6fNGcZatRs9ElDzNOtu61Fl7Xi9A8TqrPQHKc54VNp0KRbMaqKxyB04h-e3pK80F-Skh70PVX5Wp-rPpukkZ5WKaaZE8lXPEbJg3zo6Ie0ybtQ_6UnRcmCumjGvADNvAsV4UBaaI9ySAD2pyKS34EPLSnQU1-UA_CyS67WUTTbBL9o0iPtw50-hkBMWat4N4ljRikSHuZ3VO4QwgGQ4ZdKBxsgfXkVIVDgk2Kmj2uJqSPOoSk1JB0eRocUIaslPjwzqJSKZu_0OWarmum3Jda5g65GA3hS3r59SxKQEML62x50rXoBziTjqKW65mIDr5cne0xCR8yhI0txXYH-e4vDI504LrpNcwubEptRUIVpOtKfcahaTvqVs7lfHYJaLNR4w0u-4EpraTKCuh2xJM8wlVjrSWFDeyMGBdEVhoImJ8X3AWagsNy_5C_5dx8eTumAWLZIqp6h1-hcB-57nqRJ54IWnmjhavAHYRne-MFI0ctfcwfUqoZyaFuVEhfgoQ10coYUosHOE8JiVnofj8rDAyhQcTEOtHIn2BlkhRA4sLisYOwiZy2LbkYjD9LRosV1xgHTIrW41kFeWhqP8M5wgnN_6HWr3kg9n8e4A95UYJqF95P6hC7Ik6Od-WJctmmSgNIoEUwXZBWuoGhNuNdBWTDLjaHXBTwWawR8HrPS5gtazmvIhFIc651-hGXEtb3pxZrmNS5iLqUDsZEBxmFhfDyv4UU8zDY323GSsAUlDjRspfhLxw2b5xrhffMbG3BdCrNfCW9trVyukp4G-6QLpqVAFZ9m1MA5-4I1Wj8zlvCzyONOPitj4tcWncTY8htt69Xk_6pA3llbWNus8xn7e6nqvjPtjM4V0mxpwE0Ad3ZpW3WtL-dHcoucluGuShgYUK_OyesW3FKXXmjyGpvzfvv3Pw">Try it</a>
+        </div>
+      </div>
+
+      <div class="method-card">
+        <div class="method-strategy">Inferring</div>
+        <h3>QPCI: Quote, Paraphrase, Connect, Infer</h3>
+        <p class="method-desc">Students highlight key quotes, then build understanding in layers — paraphrasing, connecting to prior knowledge, and drawing inferences. Each annotation note walks through all four steps.</p>
+        <div class="colour-key">
+          <span class="colour-key-item"><span class="colour-dot" style="background:var(--highlight-0)"></span> Key quotes</span>
+          <span class="colour-key-item">Notes contain: Paraphrase &rarr; Connection &rarr; Inference</span>
+        </div>
+        <div class="method-actions">
+          <a href="/#TVPNatwwEH6VwacEzELa214KDZTklkCPuczaY0tY1riSHNeUQh-iT9gn6Tfyps1hlzWe-X5nfzSvzfmubYovQZpz8_x0_3im51WLtPTEiReXOOP3vcYoXWnpMQ6SmrZZks5LwcqDH13Ap9AkO32z1Uw-UnFCC-fMo5zoiyYS7hxpBBj3PTFFTNLmi6NB14TZVPKZbu5u3xHTn1-_KUkujFlfDHe3Yd0ibZr63NLNh9s3dV5jXQg-TjZdlLLOUpyPo-3RFHXDxsfbw4bE7mDYHBfqRRZJNAtHm--4clGfeKMBboH4CcaLfDfbX2FPQ08zxjKXN8e9atp4Jx3I-UzZ6dLSxqWrGmwilyRSDuOyI6ti5I57yiIAUaV57dyJHrDvOJrH3HFKgtBiD10h6JrxVEX10nEPFBAikKmtaeElojABUxS8DH4SQw7v2AYfgbTTxVgzFPUI9UTmC7YhdhFdAhriMAEPVR6idS0UVCf4ac2QTzRwV0kKXfbqcQy6maLj9eLQOlyYeovI99Y9XQLPYiMzvErVVLUc7GrdQPKxVq5pX2OaIah6ShJ8l48kGKAOBXYSy5r200t8iZ8htp6An6GQCTUAZdMV37noUsFxXUkIsRiLjyhonYFR0x-ttmu3m4_IqB6MPb56xaHloxRBKfm_1Ch04VLEShtXD4K6Vtn-XeQho0ua87sgrw2Zt07H6NH0iR6RPdepmr1lazjG44SToc1r9h3-SqlODT6hL7PdkrwiVXjIPtjFn5qffwE">Try it</a>
+        </div>
+      </div>
+
+      <div class="method-card">
+        <div class="method-strategy">Inferring</div>
+        <h3>Read Between the Lines</h3>
+        <p class="method-desc">Students work through a passage sentence by sentence, highlighting each one and adding a note that explores what is implied but never directly stated. Builds close analytical reading habits.</p>
+        <div class="colour-key">
+          <span class="colour-key-item">Highlight each sentence, then note what lies beneath the surface</span>
+        </div>
+        <div class="method-actions">
+          <a href="/#PZJNitwwEIWvUnhtGrKdTWBWCQQCycBsZiNL1ZZoSeXRT3s6IZBD5IQ5SV7JPVkYG_lVva9e6ed0nR4-zFMLLfL0MH1j4-iR284cqXmmLyFzneZpK5K2BsWzlAv-FOmrH4rN1GpWpgglLbfxPtGnsPqIpxEb66lybpwtk8mOjMNDWRoTv21RSsgr7d40CpVC2mJgR0tvKiEXCtsWb1SbaexO9HwXqrfpzUuh2teVa9M2C2c27SCrvZyN5Y_Ab_ym8N9x6jGhNoY1GsNJpV56ZWqCeqpCNZkYT_Q5k-dCiZOUG4U2aheNhrOUhBr6-_sPZrGmIr-ZCqPuNg73AIoikpQUxDsSIMl0lsJXNB1B0GqKG0lDUVvhZr0SyR2qhB-ST_SILADCirCbOqMwicPE6IphuSyCPmSlNd3EsDaErawaCdxgZobjZgIwhp3OEgX_a9DFrOEKkL6dXvJLfoL7irjBFGKk-trZXDT8J61MHRsFxxGySVi3Brv1qvBglA2t1G43EWXoer8pzc8jUc8cK9kY7EUJ5bhrVrJFBHzng-48pjtQTXAQ6lZTwtnu4QHDAVIRaT4oCmNdC8JyyC86bX9kif0ie_IhzeNkx3wFm0Pk76JxYWdaBPnJWY8SfHHRVWDGfdTP_xE5QUP17zmKHQF9PWOMXur7rgAlSSdCXaU8Vm-9ySu7mZT6GETPb0NESAadgztNv_4B">Try it</a>
+        </div>
+      </div>
+
+      <div class="method-card">
+        <div class="method-strategy">Visualising</div>
+        <h3>Sensory Scenes</h3>
+        <p class="method-desc">Students colour-code sensory details in a passage — sight, sound, smell/taste, and touch. Notes describe the mental image or feeling each detail creates. Builds awareness of how authors construct atmosphere.</p>
+        <div class="colour-key">
+          <span class="colour-key-item"><span class="colour-dot" style="background:var(--highlight-0)"></span> Sight</span>
+          <span class="colour-key-item"><span class="colour-dot" style="background:var(--highlight-1)"></span> Sound</span>
+          <span class="colour-key-item"><span class="colour-dot" style="background:var(--highlight-2)"></span> Smell / taste</span>
+          <span class="colour-key-item"><span class="colour-dot" style="background:var(--highlight-3)"></span> Touch</span>
+        </div>
+        <div class="method-actions">
+          <a href="/#LZIxjtwwDEWvQrj2DpB2gRRJirQLbJoA29AWZ8yMJBoivY4RBMghcsKcJKQ8pSTq8_9H_hreh-cP42BsmYbn4ZWqSjvgdaZKOozD2qSs5i9fJMvWnmZJBLYQ6KMykSFnBa5-zQorquKNnuE75Sw7fATl22IjfM4bxUm2mkb42ohqHIuXgTQwVKMRXrje_dpkm5e4XpdDecbc-6Gx1At8SgkQqhh5d50bT1xv3RQXbx3frkQ5Lgld5rQIcyM00ounMvoZmb75l4LtTgY7qmvuGGaurs1KgDXB3GNf4OVoWDhpvCper01qf7etFWo8w83DUgIPR617mbG-h-he3YiOcccN0qbmTzYvYc-hLb28CZoHg4aJxRkV2v2BYM14UKRV8XJ1WcxFXKLRLLfqLp0lm4JjlHQ4xXrL_mFnWx4ucu6m4_BONUnT07if21amTPGKUMSkTXx3iKmjQzsFpFVql7f6Vl_jSxD1BrJZl2l4Rrj6FwrpHEYRJsnWWXG-w78_f11Hcv_BZRVVnvLhwxdxn_HsrSqsWw7zobdE6YTzHZwhX3v0BdO5GF4TiKwzvIbtlMgXI-ap5okXyTGGPTg_BDsRLJsTAzrohKDIKRYphHrEUFh8TWBtpFGaZK-QAwuenuTMq4ts0UMvEFgm2XzJA6MPQMDXo3QIx9nXl_rJjXF1xQepsRvYI3Zkm9i8ysSH2bH_2HimTrc7iJaxMqNnauX0vhOdM3DlZjGzy_D7Pw">Try it</a>
+        </div>
+      </div>
+
+      <div class="method-card">
+        <div class="method-strategy">Questioning</div>
+        <h3>Deep Questions</h3>
+        <p class="method-desc">After reading, students highlight the most significant or surprising moments and write analysis-level questions — not questions with easy answers, but ones that would spark genuine discussion.</p>
+        <div class="colour-key">
+          <span class="colour-key-item">Highlight key moments, then pose a discussion question for each</span>
+        </div>
+        <div class="method-actions">
+          <a href="/#RVPBrtMwEPyVVc6lEleOCBBHQEhc3sWJN8nquXaevW5ehJD4CL6QL2HWbovUSrZjz87OzP4crsO7t6dBRQMP74YPzBt9rVxUUizDadhyumyKL9_YedKVaXOluIVpcpnnGsJxps-yrAF_bRcu6cJRC9ZOaWYOOClKRZYos0wuKqVMpeYtS5G4nOkT9uymldY70Imc9-QoJmXaRVdyET8XjiLlTeArUF9uNOnv7z92EdcfR_cnabxKqgXLsnM-0VhRPHLntqcaPC0cOTuUwaIKvnkpUy0FMGcIoPxq7f9YObbugrNepjWlQNKPNO2RppAK-xOIjMkfBN0UXNif6fvKmWmFfCMD5Pal0H6HXFPZRF14YLiI3hcH-Med7CTs7qBgDHdXaKra2xmPTkIu1hYfMAarGZLa8Y2pLefmkPFYTIJkUsy0cdoCN5Y0rRJ8RsWbMgmttaeT6HGylWT4n5u9xcmN6sKm_ciqDB99nVzzQK3vM328cj6s4HPkHYdSGn8z7KUKdNdcubci2j6xKwIk1B45CLw2u7oMLqBGBP6Vz0_xKRrrsYI1cgRGSoy0Hr37PdHBLhegYA8pkEvjMaZqQqCYkdeaI3vbSURFBzdq6Xoc9Mxbz3QK5l4I5jWotYerJdNDnJSz-JRLV8PKmBnYPtzbBR-stdzDfaSKZ6bxCobtSkPP1sYM4zVAb9yX2ZhlvvBlhJoAseCK_o8TWnso0YLoxTdxvbQuXNe0ZUGzi4up2abuS3MeABXkMkTHxJvoRZEzm6kW9064PZfAceK-sSy27EoIhUJKzyCHWt7t8Uzvu5kjtyw6cJlnttjQsylhsQvOoB6zyK9i03Ifqc2mTDkWJvhvc4Dit6yCIIqC2ZX9LWTDr38">Try it</a>
+        </div>
+      </div>
+
+      <div class="method-card">
+        <div class="method-strategy">Summarising</div>
+        <h3>Guided Summary</h3>
+        <p class="method-desc">A structured five-step approach: highlight the main-idea sentences the passage couldn't survive without, then write a one-sentence paraphrase for each. The notes become the skeleton of a summary.</p>
+        <div class="colour-key">
+          <span class="colour-key-item"><span class="colour-dot" style="background:var(--highlight-0)"></span> Main-idea sentences</span>
+          <span class="colour-key-item">Notes contain a one-sentence paraphrase of each</span>
+        </div>
+        <div class="method-actions">
+          <a href="/#TVTLjtQ6EP2VUq8YKdOaaS4gzQ6kC5fVlRgkNmyqk0picOzIZacnQkh8BF_Il3DKnhEsOp3Y9Th16lR9O2yHu9vukF32crg7vCtukIHuy7Jw2g_dYU1xWTNu3kbv44XyLCqkWVa9o2e3V_Sfm2aPX7YrWtiFa4RgUglZQi9Kv378rHcx4MNeVlblSaiPxQ8UYiYtaXOb0MXlOZZ8pGenK3obEwn3M81PKTriYSA2l2aLd0S9fsqFyInXObEKQjy_ok-zBNpjIU5CA0w7-0o1gJLOFcAY01Jx6VfxkmOgOCKwNg6OICHLg1HwETbvknCmN5ySk0QfRMYObCTJ_ezCRHHD6al7fnNDX52Pi-BKiX3EnaUIMeGPNaN4eyLT6wJ_9o47co0fz2kSXHq3WUxclz6XZAzSv4wAR3qfzXhGAsqRlojLPHOg2-4FUusqvUNeRB-dzh39g8O8r-2oj0gHKsNgHQhovOIciRPFNHFwuhgOlDnIKrBCWoOVUKyRhV8cqrvO4rOk4-fwObwp-Y8VsJUwIGCeja8jfXBa6ekFILMsqyS2klADo-89F4XsFgijwaOzt9abj2zorpILdLq5fdnZ85U9TzetBryduiYUNLhxoXB6oqQxqgBR1XDhbLj-hpAcJG1pagAUmC8RtU8oBb07o6dNHhAEXIE3Qb1dA6okD6v4asB-YmnMTa45LbDypjhDKkHStKN5YzWfTUlAoU6zdvXoMaRmTvA3n8FJpfceDQ3ZLKuWE_fGDXo_OmtE9CW7GPRI96YJMzkD_mBGlucadcKZQ37k1zTnQqXVo0RQEaFo-P9vQmhJrLLkFsuLMHXeehQzXJ-TTaOECkH6OaDGaTc0SUYvvQ10aEuBL7zTiCVCW_Gon9HYphGFXYNs0lkiBA-QwqlvAIz-RmaobRkfd4_DrCfThDkDlffQTbamIqdJefLxjAp7TmcoVxanWk3rDsBuyK5n73dkG0ovQ6X341_KtYX0BUMJ_tGyzaUYjAOERKQidfi0rCtGGUFRdYGAFuAabJJ3utiMt02g7oHOQIj8WD8egw2PEErNb-3Fet2wLvXPTGHoxbvZPsGnrUPF8ePgArxVFpelBJdrv94DhI8o-1KX2VloxFDSyAnve0TEuntt8I6H778B">Try it</a>
+        </div>
+      </div>
+
+      <div class="method-card">
+        <div class="method-strategy">Inferring</div>
+        <h3>How Do They Feel? How Do You Know?</h3>
+        <p class="method-desc">Students highlight moments where a character's emotions are shown rather than told. Notes name the emotion and explain the textual evidence — what the character does, says, or doesn't do that reveals how they feel.</p>
+        <div class="colour-key">
+          <span class="colour-key-item">Highlight emotional moments; notes name the emotion + evidence</span>
+        </div>
+        <div class="method-actions">
+          <a href="/#RZNBi9wwDIX_isilLYSBXvdSCqVs6XUvhb1oYs3YjGO5tjOZUPrf--Rk6CGHWNaT3if5z3AfXj6PQwstyvAyvOpK35TevGz0XSR-oePkly70M-n6ZRiHXHTOzW6Hq4_4Gs06S2qVVi9FiGnyXHhqUj5Ukllb0FSJEape10QfkzZqGt2nE_1ItOlSCEcyUuJZqHl5ZlkM_yHd7HTrGhc0FtKVODmSR44cEgozFOXRFo4k9-AkTUJR3C6gyMaFkNBSLtLYtE_wYilw8qYz1abqyGRQ_hba5AW6ITldR1oZ_1bUgo0fgfISI_HK24leUSlcGor5UMlbX-dl15m4IBfeYxF2G7WlpKfMpCVJ6eleoutnK99hUAsY7kwparpKGS2aYAgmGrmi-fSe3tOrZVQve3JbFaIX8KFpybUDAp5pD8-EM4AhZyMAWkvBlG4jun82ZZcIhKZQJcLam1W1vkI-ipxB1o_oMbrjZIravLFV-r1wAeI69tqusGWhYb1LOdDlbhhwp9sBrLPFIrROylZjg02xxeom0QN5XWr3SlDaUCdI60Irx1vvo-hy9SQ8eSqKceJquOx1dm-YLLT7ED1jQgJnjW-SjO2ebNr7DaskD6xw3I6lhguOGLf1W_vamp-abSOt4HjQcf_VayshGwGD0W97EbySg90xgplbK1Kh-ZXOqjeq6PSIQa6PrPE52hDAmQnTkZAbgYgzm9zTZi63TiSHThb9LnkkW7udvD3xfS552bfI9oCveD7PXZrZ2esFguJshUgvx0LhBfgAtBBywfUhuYJXeRr-_gM">Try it</a>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="book-link">
+      These methods are adapted from <a href="https://practicalreadingstrategies.com/" target="_blank" rel="noopener">Practical Reading Strategies</a> by Leon Furze.
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>Built by <a href="https://leonfurze.com" target="_blank" rel="noopener">Leon Furze</a> · <a href="https://github.com/lfurze/read-closer" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+</body>
+</html>
