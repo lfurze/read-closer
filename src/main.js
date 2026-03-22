@@ -40,6 +40,7 @@ let appState = null;
 let selectedColour = 0;
 let selectionRange = null; // { start, end }
 let visibleAuthors = null; // null = show all
+let clearActiveGlobal = null;
 
 const COLOURS = ['#FFF3B0', '#B8D4E3', '#C2E0C6', '#F5C6CB'];
 
@@ -237,31 +238,42 @@ function renderMarginNotes(annotations) {
 
   positionMarginNotes(sorted);
 
-  // Click highlight → pop the card
+  // Click highlight → activate its card; click card snippet → activate its highlight
+  // Clicking anywhere else clears the active state
+  function clearActive() {
+    marginNotes.querySelectorAll('.note-card.active').forEach(c => c.classList.remove('active'));
+    passageText.querySelectorAll('.highlight.active').forEach(h => h.classList.remove('active'));
+  }
+
   passageText.querySelectorAll('.highlight').forEach(el => {
-    el.addEventListener('click', () => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      clearActive();
       const id = el.dataset.id;
       const card = marginNotes.querySelector(`.note-card[data-id="${id}"]`);
       if (!card) return;
+      card.classList.add('active');
       card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      card.classList.add('pop');
-      setTimeout(() => card.classList.remove('pop'), 600);
     });
   });
 
-  // Click card → pulse the highlight
   marginNotes.querySelectorAll('.note-card').forEach(card => {
-    card.querySelector('.note-snippet')?.addEventListener('click', () => {
+    card.querySelector('.note-snippet')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      clearActive();
       const id = card.dataset.id;
+      card.classList.add('active');
       const highlights = passageText.querySelectorAll(`.highlight[data-id="${id}"]`);
       if (!highlights.length) return;
+      highlights.forEach(h => h.classList.add('active'));
       highlights[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      highlights.forEach(el => {
-        el.classList.add('pulse');
-        setTimeout(() => el.classList.remove('pulse'), 600);
-      });
     });
   });
+
+  // Use a named function so we can avoid stacking listeners
+  document.removeEventListener('click', clearActiveGlobal);
+  clearActiveGlobal = clearActive;
+  document.addEventListener('click', clearActiveGlobal);
 
   marginNotes.querySelectorAll('.delete-note').forEach(btn => {
     btn.addEventListener('click', () => {
