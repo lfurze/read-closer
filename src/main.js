@@ -237,6 +237,32 @@ function renderMarginNotes(annotations) {
 
   positionMarginNotes(sorted);
 
+  // Click highlight → pop the card
+  passageText.querySelectorAll('.highlight').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.dataset.id;
+      const card = marginNotes.querySelector(`.note-card[data-id="${id}"]`);
+      if (!card) return;
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      card.classList.add('pop');
+      setTimeout(() => card.classList.remove('pop'), 600);
+    });
+  });
+
+  // Click card → pulse the highlight
+  marginNotes.querySelectorAll('.note-card').forEach(card => {
+    card.querySelector('.note-snippet')?.addEventListener('click', () => {
+      const id = card.dataset.id;
+      const highlights = passageText.querySelectorAll(`.highlight[data-id="${id}"]`);
+      if (!highlights.length) return;
+      highlights[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      highlights.forEach(el => {
+        el.classList.add('pulse');
+        setTimeout(() => el.classList.remove('pulse'), 600);
+      });
+    });
+  });
+
   marginNotes.querySelectorAll('.delete-note').forEach(btn => {
     btn.addEventListener('click', () => {
       appState = removeAnnotation(appState, btn.dataset.id);
