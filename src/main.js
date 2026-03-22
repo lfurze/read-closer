@@ -251,6 +251,7 @@ function renderMarginNotes(annotations) {
       if (!form.classList.contains('hidden')) {
         form.querySelector('.edit-input').focus();
       }
+      positionMarginNotes(sorted);
     });
   });
 
@@ -277,6 +278,7 @@ function renderMarginNotes(annotations) {
       if (!form.classList.contains('hidden')) {
         form.querySelector('.reply-input').focus();
       }
+      positionMarginNotes(sorted);
     });
   });
 
