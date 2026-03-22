@@ -206,6 +206,14 @@ textarea {
 .reply-author { font-weight: 600; color: var(--text-muted); margin-right: 0.3rem; }
 .reply-text { color: var(--text); }
 
+.no-note { font-style: italic; color: var(--text-muted); font-size: 0.8rem; }
+
+.edit-form { display: flex; gap: 0.4rem; margin-top: 0.4rem; }
+.edit-form input {
+  flex: 1; padding: 0.3rem 0.5rem; border: 1px solid var(--border);
+  border-radius: var(--radius); font-size: 0.8rem;
+}
+
 .reply-form { display: flex; gap: 0.4rem; margin-top: 0.4rem; }
 .reply-form input {
   flex: 1; padding: 0.3rem 0.5rem; border: 1px solid var(--border);
@@ -289,7 +297,9 @@ textarea {
   /* Passage text readable but not too large */
   .passage-text { font-size: 1rem; line-height: 1.8; }
 
-  /* Reply form stacks better */
+  /* Edit and reply forms stack better */
+  .edit-form { flex-direction: column; }
+  .edit-form input { font-size: 16px; }
   .reply-form { flex-direction: column; }
   .reply-form input { font-size: 16px; }
 

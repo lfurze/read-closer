@@ -1,5 +1,5 @@
 import { encode, decode } from './codec.js';
-import { createState, addAnnotation, removeAnnotation, addReply, getAuthors } from './state.js';
+import { createState, addAnnotation, removeAnnotation, updateAnnotation, addReply, getAuthors } from './state.js';
 import { renderPassage } from './renderer.js';
 import { jsPDF } from 'jspdf';
 
@@ -201,11 +201,12 @@ function renderAuthorFilters(authors) {
 
 function renderMarginNotes(annotations) {
   const currentName = nameInput.value.trim() || '';
-  const notesWithNotes = annotations.filter(a => a.note).sort((a, b) => a.start - b.start);
+  const sorted = [...annotations].sort((a, b) => a.start - b.start);
 
-  marginNotes.innerHTML = notesWithNotes.map(a => {
+  marginNotes.innerHTML = sorted.map(a => {
     const snippet = appState.text.slice(a.start, Math.min(a.end, a.start + 40));
     const canEdit = a.author === currentName;
+    const hasNote = a.note && a.note.trim();
     const replies = (a.replies || []).map(r => `
       <div class="reply">
         <span class="reply-author">${escapeHtml(r.author)}</span>
@@ -215,12 +216,18 @@ function renderMarginNotes(annotations) {
       <div class="note-card" data-id="${a.id}" style="border-left: 3px solid ${COLOURS[a.colour] || COLOURS[0]}">
         <div class="note-author">${escapeHtml(a.author)}</div>
         <div class="note-snippet">"${escapeHtml(snippet)}${a.end - a.start > 40 ? '…' : ''}"</div>
-        <div class="note-body">${escapeHtml(a.note)}</div>
+        <div class="note-body">${hasNote ? escapeHtml(a.note) : '<span class="no-note">No note</span>'}</div>
         ${replies ? `<div class="replies">${replies}</div>` : ''}
         <div class="note-actions">
+          ${canEdit ? `<button class="edit-toggle" data-id="${a.id}">Edit</button>` : ''}
           <button class="reply-toggle" data-id="${a.id}">Reply</button>
           ${canEdit ? `<button class="delete-note" data-id="${a.id}">Delete</button>` : ''}
         </div>
+        ${canEdit ? `
+        <div class="edit-form hidden" data-id="${a.id}">
+          <input type="text" class="edit-input" value="${escapeAttr(a.note || '')}" placeholder="Add or edit your note…" maxlength="500">
+          <button class="edit-submit btn-primary btn-small" data-id="${a.id}">Save</button>
+        </div>` : ''}
         <div class="reply-form hidden" data-id="${a.id}">
           <input type="text" class="reply-input" placeholder="Write a reply…" maxlength="300">
           <button class="reply-submit btn-primary btn-small" data-id="${a.id}">Send</button>
@@ -228,12 +235,38 @@ function renderMarginNotes(annotations) {
       </div>`;
   }).join('');
 
-  positionMarginNotes(notesWithNotes);
+  positionMarginNotes(sorted);
 
   marginNotes.querySelectorAll('.delete-note').forEach(btn => {
     btn.addEventListener('click', () => {
       appState = removeAnnotation(appState, btn.dataset.id);
       renderRead();
+    });
+  });
+
+  marginNotes.querySelectorAll('.edit-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const form = marginNotes.querySelector(`.edit-form[data-id="${btn.dataset.id}"]`);
+      form.classList.toggle('hidden');
+      if (!form.classList.contains('hidden')) {
+        form.querySelector('.edit-input').focus();
+      }
+    });
+  });
+
+  marginNotes.querySelectorAll('.edit-submit').forEach(btn => {
+    const form = btn.closest('.edit-form');
+    const input = form.querySelector('.edit-input');
+    const submitEdit = () => {
+      appState = updateAnnotation(appState, btn.dataset.id, { note: input.value.trim() });
+      renderRead();
+    };
+    btn.addEventListener('click', submitEdit);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        submitEdit();
+      }
     });
   });
 
