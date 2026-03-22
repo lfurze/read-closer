@@ -212,9 +212,11 @@ textarea {
 .note-card .note-snippet:hover { color: var(--text); }
 
 .note-card.active {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.14);
-  border-color: #ccc;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  border-color: #bbb;
+  background: #fffff5;
+  transform: scale(1.02);
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s, background 0.2s;
 }
 
 .highlight.active {
