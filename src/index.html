@@ -3,14 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Annotate — Close Reading Tool</title>
+  <title>read/closer — Close Reading & Annotation Tool</title>
+  <meta name="description" content="Share passages for close reading and annotation. No accounts, no servers — everything lives in the link.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
+  <nav class="site-header">
+    <a href="/" class="logo">read<span class="logo-slash">/</span>closer</a>
+  </nav>
+
   <!-- CREATE SCREEN -->
   <main id="create-screen" class="screen">
     <header class="create-header">
-      <h1>Annotate</h1>
       <p class="subtitle">Share passages for close reading. No accounts, no servers — everything lives in the link.</p>
     </header>
 
@@ -54,6 +61,7 @@
     <header class="read-header">
       <h2 id="passage-title"></h2>
       <p id="passage-prompt" class="prompt-text"></p>
+      <p class="instructions">Select any text to highlight and annotate it. Your annotations are saved into the link — share it to pass your reading on.</p>
       <div class="name-row">
         <label for="name-input">Your name:</label>
         <input type="text" id="name-input" placeholder="Anonymous" maxlength="40">
@@ -89,6 +97,10 @@
       <button id="share-export-btn" class="btn-secondary" type="button">Export Notes</button>
     </div>
   </main>
+
+  <footer class="site-footer">
+    <p>Built by <a href="https://leonfurze.com" target="_blank" rel="noopener">Leon Furze</a> · <a href="https://github.com/leonfurze/read-closer" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
 
   <script type="module" src="./main.js"></script>
 </body>

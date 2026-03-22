@@ -45,7 +45,22 @@ export function updateAnnotation(state, id, fields) {
 }
 
 /**
- * Get unique author names in annotation order.
+ * Add a reply to an annotation by id, returning a new state.
+ */
+export function addReply(state, annotationId, { author, text }) {
+  const id = randomId();
+  return {
+    ...state,
+    annotations: state.annotations.map(a =>
+      a.id === annotationId
+        ? { ...a, replies: [...(a.replies || []), { id, author, text }] }
+        : a
+    ),
+  };
+}
+
+/**
+ * Get unique author names in annotation order (including reply authors).
  */
 export function getAuthors(state) {
   const seen = new Set();
@@ -54,6 +69,14 @@ export function getAuthors(state) {
     if (!seen.has(a.author)) {
       seen.add(a.author);
       authors.push(a.author);
+    }
+    if (a.replies) {
+      for (const r of a.replies) {
+        if (!seen.has(r.author)) {
+          seen.add(r.author);
+          authors.push(r.author);
+        }
+      }
     }
   }
   return authors;

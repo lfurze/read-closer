@@ -1,7 +1,8 @@
 import { encode, decode } from './codec.js';
-import { createState, addAnnotation, removeAnnotation, getAuthors } from './state.js';
+import { createState, addAnnotation, removeAnnotation, addReply, getAuthors } from './state.js';
 import { renderPassage } from './renderer.js';
 import QRCode from 'qrcode';
+import { jsPDF } from 'jspdf';
 
 // ===== DOM refs =====
 const createScreen = document.getElementById('create-screen');
@@ -221,20 +222,35 @@ function renderAuthorFilters(authors) {
 
 function renderMarginNotes(annotations) {
   const currentName = nameInput.value.trim() || '';
-  marginNotes.innerHTML = annotations
-    .filter(a => a.note)
-    .sort((a, b) => a.start - b.start)
-    .map(a => {
-      const snippet = appState.text.slice(a.start, Math.min(a.end, a.start + 40));
-      const canEdit = a.author === currentName;
-      return `
-        <div class="note-card" data-id="${a.id}" style="border-left: 3px solid ${COLOURS[a.colour] || COLOURS[0]}">
-          <div class="note-author">${escapeHtml(a.author)}</div>
-          <div class="note-snippet">"${escapeHtml(snippet)}${a.end - a.start > 40 ? '…' : ''}"</div>
-          <div class="note-body">${escapeHtml(a.note)}</div>
-          ${canEdit ? `<div class="note-actions"><button class="delete-note" data-id="${a.id}">Delete</button></div>` : ''}
-        </div>`;
-    }).join('');
+  const notesWithNotes = annotations.filter(a => a.note).sort((a, b) => a.start - b.start);
+
+  marginNotes.innerHTML = notesWithNotes.map(a => {
+    const snippet = appState.text.slice(a.start, Math.min(a.end, a.start + 40));
+    const canEdit = a.author === currentName;
+    const replies = (a.replies || []).map(r => `
+      <div class="reply">
+        <span class="reply-author">${escapeHtml(r.author)}</span>
+        <span class="reply-text">${escapeHtml(r.text)}</span>
+      </div>`).join('');
+    return `
+      <div class="note-card" data-id="${a.id}" style="border-left: 3px solid ${COLOURS[a.colour] || COLOURS[0]}">
+        <div class="note-author">${escapeHtml(a.author)}</div>
+        <div class="note-snippet">"${escapeHtml(snippet)}${a.end - a.start > 40 ? '…' : ''}"</div>
+        <div class="note-body">${escapeHtml(a.note)}</div>
+        ${replies ? `<div class="replies">${replies}</div>` : ''}
+        <div class="note-actions">
+          <button class="reply-toggle" data-id="${a.id}">Reply</button>
+          ${canEdit ? `<button class="delete-note" data-id="${a.id}">Delete</button>` : ''}
+        </div>
+        <div class="reply-form hidden" data-id="${a.id}">
+          <input type="text" class="reply-input" placeholder="Write a reply…" maxlength="300">
+          <button class="reply-submit btn-primary btn-small" data-id="${a.id}">Send</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Position each note card alongside its highlight span
+  positionMarginNotes(notesWithNotes);
 
   marginNotes.querySelectorAll('.delete-note').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -242,6 +258,54 @@ function renderMarginNotes(annotations) {
       renderRead();
     });
   });
+
+  marginNotes.querySelectorAll('.reply-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const form = marginNotes.querySelector(`.reply-form[data-id="${btn.dataset.id}"]`);
+      form.classList.toggle('hidden');
+      if (!form.classList.contains('hidden')) {
+        form.querySelector('.reply-input').focus();
+      }
+    });
+  });
+
+  marginNotes.querySelectorAll('.reply-submit').forEach(btn => {
+    const form = btn.closest('.reply-form');
+    const input = form.querySelector('.reply-input');
+    const submitReply = () => {
+      const text = input.value.trim();
+      if (!text) return;
+      const author = nameInput.value.trim() || 'Anonymous';
+      appState = addReply(appState, btn.dataset.id, { author, text });
+      renderRead();
+    };
+    btn.addEventListener('click', submitReply);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        submitReply();
+      }
+    });
+  });
+}
+
+function positionMarginNotes(annotations) {
+  const containerTop = passageText.getBoundingClientRect().top;
+
+  let lastBottom = 0;
+  for (const ann of annotations) {
+    const highlightEl = passageText.querySelector(`.highlight[data-id="${ann.id}"]`);
+    const cardEl = marginNotes.querySelector(`.note-card[data-id="${ann.id}"]`);
+    if (!highlightEl || !cardEl) continue;
+
+    // Target: align note with its highlight
+    const highlightTop = highlightEl.getBoundingClientRect().top - containerTop;
+    // Prevent overlap with previous note
+    const top = Math.max(highlightTop, lastBottom);
+    cardEl.style.top = `${top}px`;
+
+    lastBottom = top + cardEl.offsetHeight + 8;
+  }
 }
 
 function updateUrl() {
@@ -292,8 +356,18 @@ function positionToolbar(sel) {
   const range = sel.getRangeAt(0);
   const rect = range.getBoundingClientRect();
   toolbar.classList.remove('hidden');
-  toolbar.style.top = `${rect.bottom + window.scrollY + 8}px`;
-  toolbar.style.left = `${Math.max(8, rect.left + window.scrollX)}px`;
+
+  // Measure toolbar height so we can flip above if needed
+  const toolbarHeight = toolbar.offsetHeight;
+  const spaceBelow = window.innerHeight - rect.bottom;
+
+  if (spaceBelow < toolbarHeight + 16) {
+    // Not enough room below — position above the selection
+    toolbar.style.top = `${rect.top - toolbarHeight - 8}px`;
+  } else {
+    toolbar.style.top = `${rect.bottom + 8}px`;
+  }
+  toolbar.style.left = `${Math.max(8, rect.left)}px`;
   noteInput.value = '';
   noteInput.focus();
 }
@@ -315,7 +389,7 @@ toolbar.querySelectorAll('.swatch').forEach(btn => {
 // Default selection
 toolbar.querySelector('.swatch')?.classList.add('selected');
 
-saveAnnotationBtn.addEventListener('click', () => {
+function submitAnnotation() {
   if (!selectionRange) return;
   const author = nameInput.value.trim() || 'Anonymous';
   appState = addAnnotation(appState, {
@@ -327,6 +401,15 @@ saveAnnotationBtn.addEventListener('click', () => {
   });
   hideToolbar();
   renderRead();
+}
+
+saveAnnotationBtn.addEventListener('click', submitAnnotation);
+
+noteInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault();
+    submitAnnotation();
+  }
 });
 
 cancelAnnotationBtn.addEventListener('click', hideToolbar);
@@ -363,18 +446,147 @@ shareExportBtn.addEventListener('click', () => {
     alert('No annotations to export.');
     return;
   }
-  const lines = ['Highlighted Text\tNote\tAuthor\tStart\tEnd'];
-  for (const a of appState.annotations) {
-    const highlighted = appState.text.slice(a.start, a.end);
-    lines.push(`${highlighted}\t${a.note}\t${a.author}\t${a.start}\t${a.end}`);
-  }
-  const blob = new Blob([lines.join('\n')], { type: 'text/tab-separated-values' });
-  const link = document.createElement('a');
-  link.download = 'annotations.tsv';
-  link.href = URL.createObjectURL(blob);
-  link.click();
-  URL.revokeObjectURL(link.href);
+  exportPdf(appState);
 });
+
+function exportPdf(state) {
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const margin = 20;
+  const contentW = pageW - margin * 2;
+  let y = margin;
+
+  const COLOUR_RGB = [[255, 243, 176], [184, 212, 227], [194, 224, 198], [245, 198, 203]];
+
+  function addHeader() {
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor('#1a1a1a');
+    doc.text('read', margin, y);
+    const readW = doc.getTextWidth('read');
+    doc.setTextColor('#999999');
+    doc.text('/', margin + readW, y);
+    const slashW = doc.getTextWidth('/');
+    doc.setTextColor('#1a1a1a');
+    doc.text('closer', margin + readW + slashW, y);
+    y += 3;
+    doc.setDrawColor('#e0ddd8');
+    doc.line(margin, y, pageW - margin, y);
+    y += 8;
+  }
+
+  function addFooter() {
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor('#999999');
+    doc.text('readcloser.com', pageW / 2, pageH - 10, { align: 'center' });
+  }
+
+  function checkPage(needed) {
+    if (y + needed > pageH - margin) {
+      addFooter();
+      doc.addPage();
+      y = margin;
+    }
+  }
+
+  addHeader();
+
+  function writeText(text, x, maxW, opts = {}) {
+    const fontSize = opts.fontSize || 10;
+    const style = opts.style || 'normal';
+    doc.setFontSize(fontSize);
+    doc.setFont('helvetica', style);
+    doc.setTextColor(opts.color || '#1a1a1a');
+    const lines = doc.splitTextToSize(text, maxW);
+    const lineH = fontSize * 0.45;
+    for (const line of lines) {
+      checkPage(lineH);
+      doc.text(line, x, y);
+      y += lineH;
+    }
+    return lines.length;
+  }
+
+  // Title
+  if (state.title) {
+    writeText(state.title, margin, contentW, { fontSize: 18, style: 'bold' });
+    y += 3;
+  }
+
+  // Prompt
+  if (state.prompt) {
+    writeText(state.prompt, margin, contentW, { fontSize: 11, style: 'italic', color: '#666666' });
+    y += 3;
+  }
+
+  // Subtitle
+  writeText('Annotations', margin, contentW, { fontSize: 13, style: 'bold' });
+  y += 2;
+
+  // Divider
+  doc.setDrawColor('#e0ddd8');
+  doc.line(margin, y, pageW - margin, y);
+  y += 6;
+
+  // Annotations sorted by position
+  const sorted = [...state.annotations].filter(a => a.note).sort((a, b) => a.start - b.start);
+
+  for (const ann of sorted) {
+    const snippet = state.text.slice(ann.start, ann.end);
+    const colourIdx = ann.colour || 0;
+
+    checkPage(25);
+
+    // Highlight colour bar
+    const rgb = COLOUR_RGB[colourIdx] || COLOUR_RGB[0];
+    doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+    doc.rect(margin, y - 3, 3, 14, 'F');
+
+    const indentX = margin + 6;
+    const indentW = contentW - 6;
+
+    // Author
+    writeText(ann.author, indentX, indentW, { fontSize: 8, style: 'bold', color: '#666666' });
+    y += 0.5;
+
+    // Quoted snippet
+    const truncated = snippet.length > 200 ? snippet.slice(0, 200) + '…' : snippet;
+    writeText(`"${truncated}"`, indentX, indentW, { fontSize: 9, style: 'italic', color: '#555555' });
+    y += 1;
+
+    // Note
+    writeText(ann.note, indentX, indentW, { fontSize: 10 });
+
+    // Replies
+    if (ann.replies && ann.replies.length > 0) {
+      y += 1.5;
+      for (const reply of ann.replies) {
+        checkPage(10);
+        const replyX = indentX + 4;
+        const replyW = indentW - 4;
+
+        // Reply indicator
+        doc.setDrawColor('#cccccc');
+        doc.line(indentX + 1, y - 2.5, indentX + 1, y + 2);
+
+        writeText(`${reply.author}:`, replyX, replyW, { fontSize: 8, style: 'bold', color: '#666666' });
+        writeText(reply.text, replyX, replyW, { fontSize: 9, color: '#333333' });
+        y += 1;
+      }
+    }
+
+    y += 6;
+  }
+
+  addFooter();
+
+  const filename = state.title
+    ? `${state.title.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '-').toLowerCase()}-annotations.pdf`
+    : 'annotations.pdf';
+  doc.save(filename);
+}
 
 // ===== HELPERS =====
 function escapeHtml(str) {

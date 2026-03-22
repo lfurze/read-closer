@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createState, addAnnotation, removeAnnotation, updateAnnotation, getAuthors } from '../src/state.js';
+import { createState, addAnnotation, removeAnnotation, updateAnnotation, addReply, getAuthors } from '../src/state.js';
 
 describe('state management', () => {
   it('creates a state from decoded data', () => {
@@ -62,5 +62,52 @@ describe('state management', () => {
       ],
     });
     expect(getAuthors(state)).toEqual(['Alice', 'Bob']);
+  });
+
+  it('adds a reply to an annotation', () => {
+    const state = createState({
+      v: 1, text: 'Hello',
+      annotations: [{ id: 'r1', author: 'Alice', start: 0, end: 5, colour: 0, note: 'interesting' }],
+    });
+    const updated = addReply(state, 'r1', { author: 'Bob', text: 'I agree!' });
+    expect(updated.annotations[0].replies).toHaveLength(1);
+    expect(updated.annotations[0].replies[0].author).toBe('Bob');
+    expect(updated.annotations[0].replies[0].text).toBe('I agree!');
+    expect(updated.annotations[0].replies[0].id).toHaveLength(6);
+  });
+
+  it('does not mutate original when adding a reply', () => {
+    const state = createState({
+      v: 1, text: 'Hello',
+      annotations: [{ id: 'r2', author: 'A', start: 0, end: 5, colour: 0, note: 'x' }],
+    });
+    const updated = addReply(state, 'r2', { author: 'B', text: 'reply' });
+    expect(state.annotations[0].replies).toBeUndefined();
+    expect(updated.annotations[0].replies).toHaveLength(1);
+  });
+
+  it('preserves existing replies when adding another', () => {
+    const state = createState({
+      v: 1, text: 'Hello',
+      annotations: [{
+        id: 'r3', author: 'A', start: 0, end: 5, colour: 0, note: 'x',
+        replies: [{ id: 'rp1', author: 'B', text: 'first' }],
+      }],
+    });
+    const updated = addReply(state, 'r3', { author: 'C', text: 'second' });
+    expect(updated.annotations[0].replies).toHaveLength(2);
+    expect(updated.annotations[0].replies[0].text).toBe('first');
+    expect(updated.annotations[0].replies[1].text).toBe('second');
+  });
+
+  it('includes reply authors in getAuthors', () => {
+    const state = createState({
+      v: 1, text: 'Hello',
+      annotations: [{
+        id: 'r4', author: 'Alice', start: 0, end: 5, colour: 0, note: 'x',
+        replies: [{ id: 'rp1', author: 'Charlie', text: 'hi' }],
+      }],
+    });
+    expect(getAuthors(state)).toEqual(['Alice', 'Charlie']);
   });
 });
