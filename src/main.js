@@ -303,6 +303,12 @@ function renderMarginNotes(annotations) {
 }
 
 function positionMarginNotes(annotations) {
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    marginNotes.style.minHeight = '';
+    return;
+  }
+
   const containerTop = passageText.getBoundingClientRect().top;
 
   let lastBottom = 0;
@@ -317,6 +323,9 @@ function positionMarginNotes(annotations) {
 
     lastBottom = top + cardEl.offsetHeight + 8;
   }
+
+  // Ensure the sidebar is tall enough to contain all cards
+  marginNotes.style.minHeight = `${lastBottom}px`;
 }
 
 function updateUrl() {
