@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretext POC — DOM-Free Text Layout</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #fafaf7;
+      color: #1a1a1a;
+      line-height: 1.6;
+      padding: 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    nav {
+      margin-bottom: 2rem;
+      font-size: 0.85rem;
+    }
+    nav a { color: #666; text-decoration: none; }
+    nav a:hover { color: #1a1a1a; }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 2rem 0 0.75rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e0ddd8;
+    }
+    h2:first-of-type { border-top: none; padding-top: 0; }
+
+    .demo-section {
+      background: #fff;
+      border: 1px solid #e0ddd8;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .controls label { font-size: 0.85rem; color: #666; }
+    .controls input[type="range"] { width: 200px; }
+    .controls input[type="number"] { width: 80px; padding: 0.25rem 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
+
+    button {
+      padding: 0.5rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.15s;
+    }
+    button:hover { background: #f0f0f0; }
+    button.primary {
+      background: #1a1a1a;
+      color: #fff;
+      border-color: #1a1a1a;
+    }
+    button.primary:hover { background: #333; }
+
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .result-box {
+      background: #f5f5f0;
+      border: 1px solid #e0ddd8;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .canvas-container {
+      border: 1px solid #e0ddd8;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 0.75rem;
+      background: #fff;
+      position: relative;
+    }
+    canvas { display: block; }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+    @media (max-width: 700px) {
+      .comparison-grid { grid-template-columns: 1fr; }
+    }
+    .comparison-col h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .perf-bar {
+      height: 24px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 0.75rem;
+      color: #fff;
+      font-weight: 600;
+      min-width: 40px;
+      transition: width 0.3s ease;
+      margin-bottom: 0.25rem;
+    }
+    .perf-bar.dom { background: #e74c3c; }
+    .perf-bar.pretext { background: #27ae60; }
+
+    .perf-label {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+
+    .speedup {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #27ae60;
+      margin-top: 0.5rem;
+    }
+
+    .resize-handle {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 12px;
+      background: #e0ddd8;
+      cursor: ew-resize;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .resize-handle::after {
+      content: '⋮';
+      color: #999;
+      font-size: 1.2rem;
+    }
+
+    .width-display {
+      position: absolute;
+      top: 4px;
+      right: 20px;
+      font-size: 0.7rem;
+      color: #999;
+      background: rgba(255,255,255,0.9);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .lines-info {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #e8f5e9;
+      color: #2e7d32;
+      margin-left: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <nav><a href="/">← read/closer</a></nav>
+
+  <h1>Pretext POC <span class="tag">@chenglou/pretext</span></h1>
+  <p class="subtitle">DOM-free text measurement and layout by Cheng Lou (Midjourney). Measures text ~500x faster than <code>getBoundingClientRect()</code> by using <code>canvas.measureText()</code> with cached segment data.</p>
+
+  <!-- Demo 1: Basic Measurement -->
+  <h2>1. Text Height Measurement</h2>
+  <div class="demo-section">
+    <p style="margin-bottom:0.75rem; font-size:0.9rem; color:#666;">Enter text and a container width. Pretext measures the wrapped height without touching the DOM.</p>
+    <textarea id="measure-input" rows="3">AGI 春天到了. بدأت الرحلة 🚀 — Pretext handles English, CJK, Arabic, emoji, and bidirectional text in a single prepare() call, segmenting by Unicode rules.</textarea>
+    <div class="controls" style="margin-top:0.75rem;">
+      <label>Width: <input type="range" id="measure-width" min="100" max="800" value="400"> <span id="measure-width-val">400</span>px</label>
+      <label>Line height: <input type="number" id="measure-lh" value="24" min="10" max="60"> px</label>
+      <label>Font: <input type="text" id="measure-font" value="16px Inter" style="width:120px; padding:0.25rem 0.5rem; border:1px solid #ccc; border-radius:4px;"></label>
+      <button class="primary" id="measure-btn">Measure</button>
+    </div>
+    <div id="measure-result" class="result-box" style="display:none;"></div>
+  </div>
+
+  <!-- Demo 2: Canvas Rendering -->
+  <h2>2. Canvas Text Rendering</h2>
+  <div class="demo-section">
+    <p style="margin-bottom:0.75rem; font-size:0.9rem; color:#666;">Pretext computes line breaks, then we render each line on a &lt;canvas&gt;. Drag the right edge to resize — re-layout runs in pure arithmetic (~0.0002ms per block).</p>
+    <textarea id="canvas-input" rows="4">It was a bright cold day in April, and the clocks were striking thirteen. Winston Smith, his chin nuzzled into his breast in an effort to escape the vile wind, slipped quickly through the glass doors of Victory Mansions, though not quickly enough to prevent a swirl of gritty dust from entering along with him.</textarea>
+    <div class="canvas-container" id="canvas-wrap" style="width:500px; min-width:100px;">
+      <canvas id="render-canvas"></canvas>
+      <div class="width-display" id="canvas-width-display">500px</div>
+      <div class="resize-handle" id="canvas-resize"></div>
+    </div>
+    <div class="lines-info" id="canvas-lines-info"></div>
+  </div>
+
+  <!-- Demo 3: Performance Benchmark -->
+  <h2>3. Performance: DOM vs Pretext</h2>
+  <div class="demo-section">
+    <p style="margin-bottom:0.75rem; font-size:0.9rem; color:#666;">Measures N text blocks at a given width. DOM method creates hidden elements and reads <code>offsetHeight</code>. Pretext uses cached <code>canvas.measureText()</code> data.</p>
+    <div class="controls">
+      <label>Text blocks: <input type="number" id="perf-count" value="200" min="10" max="2000"></label>
+      <button class="primary" id="perf-btn">Run Benchmark</button>
+    </div>
+    <div id="perf-result" style="display:none;">
+      <div class="comparison-grid">
+        <div class="comparison-col">
+          <h3>DOM (offsetHeight)</h3>
+          <div class="perf-bar dom" id="perf-dom-bar" style="width:0%"></div>
+          <div class="perf-label" id="perf-dom-label">—</div>
+        </div>
+        <div class="comparison-col">
+          <h3>Pretext (layout)</h3>
+          <div class="perf-bar pretext" id="perf-pretext-bar" style="width:0%"></div>
+          <div class="perf-label" id="perf-pretext-label">—</div>
+        </div>
+      </div>
+      <div class="speedup" id="perf-speedup"></div>
+      <div class="result-box" id="perf-details" style="margin-top:0.5rem;"></div>
+    </div>
+  </div>
+
+  <!-- Demo 4: Multilingual Segmentation -->
+  <h2>4. Multilingual Segmentation</h2>
+  <div class="demo-section">
+    <p style="margin-bottom:0.75rem; font-size:0.9rem; color:#666;">Pretext uses <code>Intl.Segmenter</code> to correctly segment text across languages. See how it breaks text into words/graphemes for CJK, Arabic, Thai, and emoji.</p>
+    <div class="controls">
+      <button id="seg-en" data-text="The quick brown fox jumps over the lazy dog.">English</button>
+      <button id="seg-cjk" data-text="春天到了，万物复苏。桜が咲いています。봄이 왔습니다.">CJK</button>
+      <button id="seg-ar" data-text="بدأت الرحلة في يوم مشمس وجميل">Arabic</button>
+      <button id="seg-emoji" data-text="Hello 👨‍👩‍👧‍👦 world 🏳️‍🌈 test 🚀✨">Emoji</button>
+      <button id="seg-mixed" data-text="AGI 春天到了. بدأت الرحلة 🚀 — mixed text!">Mixed</button>
+    </div>
+    <div id="seg-result" class="result-box" style="display:none;"></div>
+  </div>
+
+  <script type="module" src="./demo.js"></script>
+</body>
+</html>

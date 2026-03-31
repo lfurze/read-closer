@@ -10,6 +10,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'src/index.html'),
         examples: resolve(__dirname, 'src/examples/index.html'),
+        'pretext-demo': resolve(__dirname, 'src/pretext-demo/index.html'),
       },
     },
   },

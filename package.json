@@ -10,6 +10,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@chenglou/pretext": "^0.0.3",
     "jspdf": "^4.2.1",
     "pako": "^2.1.0"
   },
